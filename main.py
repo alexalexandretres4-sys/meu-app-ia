@@ -1,39 +1,39 @@
 import streamlit as st
-from google import genai
 import os
+import requests
 
 st.set_page_config(page_title="Meu App de IA", page_icon="🤖")
 st.title("🤖 Meu Chat com IA")
 
-# Colocamos a sua chave real direto no código para evitar erros de leitura
-api_key = "AQ.Ab8RN6I3tONVEHEU1DKD5Q2vdFjjLK2bnfs8CDNKfAM3NOfdba"
+# Cole a sua chave da Groq que começa com gsk_ aqui dentro das aspas
+api_key = "COLE_AQUI_SUA_CHAVE_GROQ"
 
-if not api_key:
-    st.error("Chave API não encontrada.")
-else:
-    # Conexão direta usando o código da sua chave
-    client = genai.Client(api_key=api_key)
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+if prompt := st.chat_input("Digite sua mensagem..."):
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
 
-    if prompt := st.chat_input("Digite sua mensagem..."):
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
-
-        with st.chat_message("assistant"):
-            try:
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt,
-                )
-                st.markdown(response.text)
-                st.session_state.messages.append({"role": "assistant", "content": response.text})
-            except Exception:
-                st.error("Erro ao conectar com a IA.")
-                
+    with st.chat_message("assistant"):
+        try:
+            # Conexão direta via API para evitar erros de instalação
+            url = "https://groq.com"
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            data = {
+                "model": "llama-3.3-70b-specdec",
+                "messages": [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages]
+            }
+            response = requests.post(url, json=data, headers=headers).json()
+            resposta_ia = response["choices"][0]["message"]["content"]
+            
+            st.markdown(resposta_ia)
+            st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
+        except Exception:
+            st.error("Erro ao conectar com a IA.")
+            
