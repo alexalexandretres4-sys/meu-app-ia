@@ -1,2 +1,4 @@
 flet
 google-generativeai
+fastapi
+uvicorn
