@@ -1,4 +1,5 @@
 import streamlit as st
+import random
 
 st.set_page_config(page_title="Meu App de IA Super Avançado", page_icon="🎬", layout="wide")
 
@@ -35,9 +36,24 @@ with st.sidebar:
 # TELA PRINCIPAL - CHAT DE IA AVANÇADO
 st.title("🤖 Chat de IA & Criador de Histórias")
 
+# Mostra o histórico de mensagens e roteiros na tela
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+        
+        # Se for uma mensagem da IA que contém um roteiro, adiciona o botão de gerar vídeo embaixo
+        if message["role"] == "assistant" and "Série:" in message["content"]:
+            # Cria uma chave única para o gerador de imagens baseado no roteiro
+            semente = random.randint(1, 999999)
+            url_cena_realista = f"https://pollinations.ai{semente}"
+            
+            st.write("---")
+            st.subheader("🎬 Visualização da Cena (Estilo Cinema Realista)")
+            # Exibe a cena gerada pela IA na tela
+            st.image(url_cena_realista, caption="Cena do episódio gerada por Inteligência Artificial", use_container_width=True)
+            
+            # Adiciona uma música dramática de fundo para acompanhar a novela
+            st.audio("https://soundhelix.com")
 
 if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da minha série'"):
     with st.chat_message("user"):
@@ -47,9 +63,8 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
     with st.chat_message("assistant"):
         texto_usuario = prompt.lower().strip()
         
-        # Sistema Avançado de IA Local (Gera histórias automáticas sem precisar de chaves)
+        # Sistema Avançado de Roteiro
         if "episódio" in texto_usuario or "episodio" in texto_usuario or "série" in texto_usuario:
-            # Encontra a última série criada
             if st.session_state.series:
                 ultima_serie = list(st.session_state.series.keys())[-1]
                 num_ep = len(st.session_state.series[ultima_serie]["episodios"]) + 1
@@ -58,12 +73,12 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
 ### 🎬 **Série:** {ultima_serie}  
 🍿 **Episódio {num_ep}:** O Início da Jornada  
 
-**[Cena 1 - Introdução]:** As luzes piscam. O cenário se baseia na sua ideia de: *"{st.session_state.series[ultima_serie]['tema']}"*.  
+**[Cena 1 - Introdução]:** As luzes mudam para um tom dramático de cinema. O cenário se baseia na sua história: *"{st.session_state.series[ultima_serie]['tema']}"*.  
 **[Roteiro & Diálogos]:**  
-- **Personagem 1:** "Vocês viram aquilo? Não pode ser real..."  
-- **Personagem 2:** "Calma, precisamos registrar isso antes que desapareça!"  
+- **Moça Pobre:** "Eu não posso me casar com ele... meu coração pertence a outro!"  
+- **Pai Autoritário:** "Você não tem escolha! Esse casamento vai salvar nossa família!"  
 
-**[Gancho para o próximo episódio]:** Uma sombra misteriosa aparece ao fundo antes da tela cortar para os créditos pretos.  
+**[Gancho de Novela]:** A porta se abre bruscamente e o namorado secreto observa tudo escondido. A música sobe com força.  
 
 *Dica: Digite 'Crie o próximo episódio' para continuar a história!*
 """
@@ -73,11 +88,9 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
         
         # Respostas Normais do Chat
         elif "oi" in texto_usuario or "olá" in texto_usuario:
-            resposta_ia = "Olá! Agora estou no Modo Super Avançado com Gerador de Séries. Use o menu lateral para começar a criar!"
-        elif "tudo bem" in texto_usuario:
-            resposta_ia = "Tudo excelente! Nosso aplicativo agora tem as funções da Zopia. O que vamos criar hoje?"
+            resposta_ia = "Olá! Agora estou no Modo Cinema Avançado com Gerador de Cenas Visuais e Música. Crie uma série no menu lateral e peça o episódio!"
         else:
-            resposta_ia = f"Processando ideia... '{prompt}'. Estou pronto para transformar essa mensagem em uma cena ou roteiro de série!"
+            resposta_ia = f"Processando sua ideia de cena... '{prompt}'."
         
         st.markdown(resposta_ia)
         st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
