@@ -5,12 +5,13 @@ import os
 st.set_page_config(page_title="Meu App de IA", page_icon="🤖")
 st.title("🤖 Meu Chat com IA")
 
-api_key = os.environ.get("GEMINI_API_KEY")
+# Colocamos a sua chave real direto no código para evitar erros de leitura
+api_key = "AQ.Ab8RN6I3tONVEHEU1DKD5Q2vdFjjLK2bnfs8CDNKfAM3NOfdba"
 
 if not api_key:
     st.error("Chave API não encontrada.")
 else:
-    # Nova forma de conectar com a IA do Google
+    # Conexão direta usando o código da sua chave
     client = genai.Client(api_key=api_key)
 
     if "messages" not in st.session_state:
@@ -27,7 +28,6 @@ else:
 
         with st.chat_message("assistant"):
             try:
-                # Comando moderno para gerar a resposta
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
                     contents=prompt,
