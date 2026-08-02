@@ -41,7 +41,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
         
-        # Se na mensagem salva existir uma imagem e um áudio, ele mostra na tela
+        # Garante a exibição correta dos elementos salvos no histórico
         if "image" in msg:
             st.write("---")
             st.subheader("🎬 Visualização da Cena (Estilo Cinema Realista)")
@@ -77,10 +77,10 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
 
 *Dica: Digite 'Crie o próximo episódio' para continuar a história!*
 """
-                # Cria os links de imagem e música direto na ação do botão
+                # Links públicos e estáveis que funcionam direto no Android/Chrome
                 semente = random.randint(1, 999999)
                 link_foto = f"https://pollinations.ai{semente}"
-                link_musica = "https://soundhelix.com"
+                link_musica = "https://w3schools.com"
                 
                 st.markdown(resposta_texto)
                 st.write("---")
