@@ -6,7 +6,7 @@ st.set_page_config(page_title="Meu App de IA", page_icon="🤖")
 st.title("🤖 Meu Chat com IA")
 
 # Cole a sua chave da Groq que começa com gsk_ aqui dentro das aspas
-api_key = "COLE_AQUI_SUA_CHAVE_GROQ"
+api_key = "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"
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
