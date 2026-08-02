@@ -36,25 +36,20 @@ with st.sidebar:
 # TELA PRINCIPAL - CHAT DE IA AVANÇADO
 st.title("🤖 Chat de IA & Criador de Histórias")
 
-# Mostra o histórico de mensagens e roteiros na tela
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# Mostra o histórico de mensagens, roteiros, imagens e músicas na tela
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
         
-        # Se for uma mensagem da IA que contém um roteiro, adiciona o botão de gerar vídeo embaixo
-        if message["role"] == "assistant" and "Série:" in message["content"]:
-            # Cria uma chave única para o gerador de imagens baseado no roteiro
-            semente = random.randint(1, 999999)
-            url_cena_realista = f"https://pollinations.ai{semente}"
-            
+        # Se na mensagem salva existir uma imagem e um áudio, ele mostra na tela
+        if "image" in msg:
             st.write("---")
             st.subheader("🎬 Visualização da Cena (Estilo Cinema Realista)")
-            # Exibe a cena gerada pela IA na tela
-            st.image(url_cena_realista, caption="Cena do episódio gerada por Inteligência Artificial", use_container_width=True)
-            
-            # Adiciona uma música dramática de fundo para acompanhar a novela
-            st.audio("https://soundhelix.com")
+            st.image(msg["image"], caption="Cena do episódio gerada por Inteligência Artificial", use_container_width=True)
+        if "audio" in msg:
+            st.audio(msg["audio"])
 
+# Campo de texto para enviar comandos
 if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da minha série'"):
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -63,13 +58,13 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
     with st.chat_message("assistant"):
         texto_usuario = prompt.lower().strip()
         
-        # Sistema Avançado de Roteiro
+        # Sistema Avançado de Roteiro que força a imagem e música a aparecerem
         if "episódio" in texto_usuario or "episodio" in texto_usuario or "série" in texto_usuario:
             if st.session_state.series:
                 ultima_serie = list(st.session_state.series.keys())[-1]
                 num_ep = len(st.session_state.series[ultima_serie]["episodios"]) + 1
                 
-                resposta_ia = f"""
+                resposta_texto = f"""
 ### 🎬 **Série:** {ultima_serie}  
 🍿 **Episódio {num_ep}:** O Início da Jornada  
 
@@ -82,16 +77,37 @@ if prompt := st.chat_input("Digite uma mensagem ou peça: 'Crie o episódio 1 da
 
 *Dica: Digite 'Crie o próximo episódio' para continuar a história!*
 """
-                st.session_state.series[ultima_serie]["episodios"].append(resposta_ia)
+                # Cria os links de imagem e música direto na ação do botão
+                semente = random.randint(1, 999999)
+                link_foto = f"https://pollinations.ai{semente}"
+                link_musica = "https://soundhelix.com"
+                
+                st.markdown(resposta_texto)
+                st.write("---")
+                st.subheader("🎬 Visualização da Cena (Estilo Cinema Realista)")
+                st.image(link_foto, caption="Cena do episódio gerada por Inteligência Artificial", use_container_width=True)
+                st.audio(link_musica)
+                
+                # Salva tudo junto na memória do chat para não sumir ao atualizar
+                st.session_state.messages.append({
+                    "role": "assistant", 
+                    "content": resposta_texto,
+                    "image": link_foto,
+                    "audio": link_musica
+                })
+                st.session_state.series[ultima_serie]["episodios"].append(resposta_texto)
             else:
-                resposta_ia = "Você ainda não criou nenhuma série no menu lateral! Preencha o nome e o tema lá na esquerda primeiro para eu gerar os episódios."
+                resposta_ia = "Você ainda não criou nenhuma série no menu lateral! Preencha o nome e o tema lá na esquerda primeiro."
+                st.markdown(resposta_ia)
+                st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
         
         # Respostas Normais do Chat
         elif "oi" in texto_usuario or "olá" in texto_usuario:
-            resposta_ia = "Olá! Agora estou no Modo Cinema Avançado com Gerador de Cenas Visuais e Música. Crie uma série no menu lateral e peça o episódio!"
+            resposta_ia = "Olá! Agora estou no Modo Cinema Avançado. Cadastre a série no menu lateral e depois peça o episódio aqui no chat!"
+            st.markdown(resposta_ia)
+            st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
         else:
-            resposta_ia = f"Processando sua ideia de cena... '{prompt}'."
-        
-        st.markdown(resposta_ia)
-        st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
-                
+            resposta_ia = f"Estou pronto para criar novas cenas! Ative o menu lateral para gerar roteiros completos."
+            st.markdown(resposta_ia)
+            st.session_state.messages.append({"role": "assistant", "content": resposta_ia})
+            
