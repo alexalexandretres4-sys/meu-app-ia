@@ -8,7 +8,7 @@ st.title("🤖 Meu Chat com IA")
 api_key = os.environ.get("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("Chave API não encontrada nas configurações da Vercel.")
+    st.error("Chave API não encontrada.")
 else:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
